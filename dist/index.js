@@ -27016,9 +27016,9 @@ class App {
     const threads = threadData
       ? [threadData]
       : await this.searchBacklog(threadType);
-    
+
     core.debug(`Found ${threads.length} open PRs`);
-    
+
     for (const thread of threads) {
       const issue = {...repo, issue_number: thread.number};
 
@@ -27063,7 +27063,7 @@ class App {
       }
 
       if (freezePr && thread.state === 'open') {
-        const workflow_url = `${process.env['GITHUB_SERVER_URL']}/${process.env['GITHUB_REPOSITORY']}/actions/runs/${process.env['GITHUB_RUN_ID']}`
+        const workflow_url = `${process.env['GITHUB_SERVER_URL']}/${process.env['GITHUB_REPOSITORY']}/actions/runs/${process.env['GITHUB_RUN_ID']}`;
 
         core.debug(`Freezing PR#${thread.number}`);
         const sha = thread.head.sha;
@@ -27073,8 +27073,8 @@ class App {
           state: freezeStatus,
           context: 'PR Freezer Status',
           target_url: workflow_url,
-          description: 'Pr is frozen'
-        })
+          description: 'PR is frozen'
+        });
       }
 
       processedThreads.push({...repo, number: thread.number});
