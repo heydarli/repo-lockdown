@@ -27172,16 +27172,22 @@ class App {
 }
 
 function getConfig() {
-  const input = Object.fromEntries(
-    Object.keys(schema.describe().keys).map(item => [item, core.getInput(item)])
-  );
+  // const input = Object.fromEntries(
+  //   Object.keys(schema.describe().keys).map(item => [item, core.getInput(item)])
+  // );
 
-  const {error, value} = schema.validate(input, {abortEarly: false});
-  if (error) {
-    throw error;
-  }
+  // TODO disable validation for now
+  // const {error, value} = schema.validate(input, {abortEarly: false});
+  // if (error) {
+  //   throw error;
+  // }
 
-  return value;
+  // return value;
+
+  return {
+    'freeze-pr': true,
+    'freeze-status': core.getInput('freeze-status')
+  };
 }
 
 run();
