@@ -6,7 +6,7 @@ const schema = require('./schema');
 
 async function run() {
   try {
-    core.debug(`Starting as [${github.context.eventName}]`);
+    console.log(`Starting as [${github.context.eventName}]`);
     const config = getConfig();
     const client = github.getOctokit(config['github-token']);
 
@@ -28,7 +28,7 @@ class App {
   }
 
   async processBacklog() {
-    core.debug('Processing backlog...');
+    console.log('Processing backlog...');
     const processOnly = this.config['process-only'];
     const threadTypes = processOnly ? [processOnly] : ['pr'];
 
@@ -39,7 +39,7 @@ class App {
 
       if (threads.length) {
         threadsFound = true;
-        core.debug(`Setting output (${threadType}s)`);
+        console.log(`Setting output (${threadType}s)`);
         core.setOutput(`${threadType}s`, JSON.stringify(threads));
       }
     }
@@ -66,7 +66,7 @@ class App {
     });
 
     if (threads.length) {
-      core.debug(`Setting output (${threadType}s)`);
+      console.log(`Setting output (${threadType}s)`);
       core.setOutput(`${threadType}s`, JSON.stringify(threads));
     }
   }
@@ -110,13 +110,13 @@ class App {
       ? [threadData]
       : await this.searchBacklog(threadType);
 
-    core.debug(`Found ${threads.length} open PRs`);
+    console.log(`Found ${threads.length} open PRs`);
 
     for (const thread of threads) {
       const issue = {...repo, issue_number: thread.number};
 
       if (comment && (thread.state === 'open' || !skipClosedComment)) {
-        core.debug(`Commenting (${threadType}: ${thread.number})`);
+        console.log(`Commenting (${threadType}: ${thread.number})`);
 
         await this.ensureUnlock(
           issue,
@@ -126,7 +126,7 @@ class App {
       }
 
       if (labels) {
-        core.debug(`Labeling (${threadType}: ${thread.number})`);
+        console.log(`Labeling (${threadType}: ${thread.number})`);
         await this.client.rest.issues.addLabels({
           ...issue,
           labels
@@ -134,12 +134,12 @@ class App {
       }
 
       if (close && thread.state === 'open') {
-        core.debug(`Closing (${threadType}: ${thread.number})`);
+        console.log(`Closing (${threadType}: ${thread.number})`);
         await this.client.rest.issues.update({...issue, state: 'closed'});
       }
 
       if (lock && !thread.locked) {
-        core.debug(`Locking (${threadType}: ${thread.number})`);
+        console.log(`Locking (${threadType}: ${thread.number})`);
         let params;
         if (lockReason) {
           params = {
@@ -158,7 +158,7 @@ class App {
       if (freezePr && thread.state === 'open') {
         const workflow_url = `${process.env['GITHUB_SERVER_URL']}/${process.env['GITHUB_REPOSITORY']}/actions/runs/${process.env['GITHUB_RUN_ID']}`;
 
-        core.debug(`Freezing PR#${thread.number}`);
+        console.log(`Freezing PR#${thread.number}`);
         
         const pull_details = await this.client.rest.pulls.get({
           ...github.context.repo,
@@ -200,7 +200,7 @@ class App {
       query += ` ${queryPart}`;
     }
 
-    core.debug(`Searching (${threadType}s)`);
+    console.log(`Searching (${threadType}s)`);
 
     const results = [];
 
