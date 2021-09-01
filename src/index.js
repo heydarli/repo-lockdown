@@ -165,10 +165,9 @@ class App {
           pull_number: thread.number
         });
 
-        console.log(JSON.stringify(pull_details));
-        console.log(JSON.stringify(thread));
+        console.log(JSON.stringify(pull_details.data.head));
 
-        const sha = pull_details.head.sha;
+        const sha = pull_details.data.head.sha;
         await this.client.rest.repos.createCommitStatus({
           ...issue,
           sha,
