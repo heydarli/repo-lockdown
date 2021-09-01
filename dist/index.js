@@ -12204,7 +12204,8 @@ function getConfig() {
 
   return {
     'freeze-pr': true,
-    'freeze-status': core.getInput('freeze-status')
+    'freeze-status': core.getInput('freeze-status'),
+    'github-token': core.getInput('freeze-status'),
   };
 }
 
