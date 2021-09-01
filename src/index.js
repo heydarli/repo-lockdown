@@ -157,7 +157,7 @@ class App {
 
         core.debug(`Freezing PR#${thread.number}`);
         const sha = thread.head.sha;
-        this.client.rest.repos.createCommitStatus({
+        await this.client.rest.repos.createCommitStatus({
           ...github.context.repo,
           sha,
           state: freezeStatus,
