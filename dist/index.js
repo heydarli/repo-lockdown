@@ -26532,7 +26532,8 @@ const extendedJoi = Joi.extend({
 
 const schema = Joi.object({
   'github-token': Joi.string().trim().max(100),
-
+  'freeze-pr': Joi.string().trim().max(100),
+  'freeze-status': Joi.string().trim().max(100),
   'exclude-issue-created-before': Joi.alternatives()
     .try(
       Joi.date()
