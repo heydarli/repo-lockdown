@@ -137,7 +137,7 @@ const schema = Joi.object({
   'skip-closed-pr-comment': Joi.boolean().default(false),
 
   'close-pr': Joi.boolean()
-    .default(true)
+    .default(false)
     .error(
       new Error(
         '"close-pr" must be a boolean, either "close-pr" or "lock-pr" must be "true"'
@@ -145,11 +145,7 @@ const schema = Joi.object({
     ),
 
   'lock-pr': Joi.boolean()
-    .when('close-pr', {
-      is: Joi.boolean().valid(false),
-      then: Joi.boolean().valid(true)
-    })
-    .default(true)
+    .default(false)
     .error(
       new Error(
         '"lock-pr" must be a boolean, either "pr-close" or "lock-pr" must be "true"'
