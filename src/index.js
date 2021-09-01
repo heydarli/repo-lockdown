@@ -2,7 +2,7 @@ const core = require('@actions/core');
 const github = require('@actions/github');
 const uniqBy = require('lodash.uniqby');
 
-const schema = require('./schema');
+//const schema = require('./schema');
 
 async function run() {
   try {
