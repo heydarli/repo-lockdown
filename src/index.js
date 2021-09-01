@@ -2,7 +2,7 @@ const core = require('@actions/core');
 const github = require('@actions/github');
 const uniqBy = require('lodash.uniqby');
 
-//const schema = require('./schema');
+const schema = require('./schema');
 
 async function run() {
   try {
@@ -265,23 +265,22 @@ class App {
 }
 
 function getConfig() {
-  // const input = Object.fromEntries(
-  //   Object.keys(schema.describe().keys).map(item => [item, core.getInput(item)])
-  // );
+  const input = Object.fromEntries(
+    Object.keys(schema.describe().keys).map(item => [item, core.getInput(item)])
+  );
 
-  // TODO disable validation for now
-  // const {error, value} = schema.validate(input, {abortEarly: false});
-  // if (error) {
-  //   throw error;
-  // }
+  const {error, value} = schema.validate(input, {abortEarly: false});
+  if (error) {
+    throw error;
+  }
 
-  // return value;
+  return value;
 
-  return {
-    'freeze-pr': true,
-    'freeze-status': core.getInput('freeze-status'),
-    'github-token': core.getInput('freeze-status'),
-  };
+  // return {
+  //   'freeze-pr': true,
+  //   'freeze-status': core.getInput('freeze-status'),
+  //   'github-token': core.getInput('freeze-status'),
+  // };
 }
 
 run();

@@ -56,6 +56,12 @@ inputs:
   process-only:
     description: 'Process only issues or pull requests, value must be either `issues` or `prs`'
     default: ''
+  freeze-pr:
+    description: 'Freeze PR`'
+    default: ''
+  freeze-status:
+    description: 'Freeze status'
+    default: ''
 outputs:
   issues:
     description: 'Issues that have been closed or locked, value is a JSON string'
