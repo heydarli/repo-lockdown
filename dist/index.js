@@ -26913,6 +26913,7 @@ const schema = __nccwpck_require__(2399);
 
 async function run() {
   try {
+    core.debug(`Starting as [${github.context.eventName}]`);
     const config = getConfig();
     const client = github.getOctokit(config['github-token']);
 
@@ -26934,10 +26935,12 @@ class App {
   }
 
   async processBacklog() {
+    core.debug('Processing backlog...');
     const processOnly = this.config['process-only'];
     const threadTypes = processOnly ? [processOnly] : ['pr'];
 
     let threadsFound = false;
+
     for (const threadType of threadTypes) {
       const threads = await this.lockdown({threadType});
 
