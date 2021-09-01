@@ -26733,7 +26733,7 @@ module.exports = JSON.parse('[["0","\\u0000",128],["a1","｡",62],["8140","　�
 /***/ ((module) => {
 
 "use strict";
-module.exports = JSON.parse('{"_from":"joi@^17.4.0","_id":"joi@17.4.0","_inBundle":false,"_integrity":"sha512-F4WiW2xaV6wc1jxete70Rw4V/VuMd6IN+a5ilZsxG4uYtUXWu2kq9W5P2dz30e7Gmw8RCbY/u/uk+dMPma9tAg==","_location":"/joi","_phantomChildren":{},"_requested":{"type":"range","registry":true,"raw":"joi@^17.4.0","name":"joi","escapedName":"joi","rawSpec":"^17.4.0","saveSpec":null,"fetchSpec":"^17.4.0"},"_requiredBy":["/"],"_resolved":"https://registry.npmjs.org/joi/-/joi-17.4.0.tgz","_shasum":"b5c2277c8519e016316e49ababd41a1908d9ef20","_spec":"joi@^17.4.0","_where":"/media/s1/dev/pr/repo-lockdown","browser":"dist/joi-browser.min.js","bugs":{"url":"https://github.com/sideway/joi/issues"},"bundleDependencies":false,"dependencies":{"@hapi/hoek":"^9.0.0","@hapi/topo":"^5.0.0","@sideway/address":"^4.1.0","@sideway/formula":"^3.0.0","@sideway/pinpoint":"^2.0.0"},"deprecated":false,"description":"Object schema validation","devDependencies":{"@hapi/bourne":"2.x.x","@hapi/code":"8.x.x","@hapi/joi-legacy-test":"npm:@hapi/joi@15.x.x","@hapi/lab":"24.x.x","typescript":"4.0.x"},"files":["lib/**/*","dist/*"],"homepage":"https://github.com/sideway/joi#readme","keywords":["schema","validation"],"license":"BSD-3-Clause","main":"lib/index.js","name":"joi","repository":{"type":"git","url":"git://github.com/sideway/joi.git"},"scripts":{"prepublishOnly":"cd browser && npm install && npm run build","test":"lab -t 100 -a @hapi/code -L -Y","test-cov-html":"lab -r html -o coverage.html -a @hapi/code"},"types":"lib/index.d.ts","version":"17.4.0"}');
+module.exports = JSON.parse('{"_args":[["joi@17.4.0","C:\\\\Dev\\\\repo-lockdown"]],"_from":"joi@17.4.0","_id":"joi@17.4.0","_inBundle":false,"_integrity":"sha512-F4WiW2xaV6wc1jxete70Rw4V/VuMd6IN+a5ilZsxG4uYtUXWu2kq9W5P2dz30e7Gmw8RCbY/u/uk+dMPma9tAg==","_location":"/joi","_phantomChildren":{},"_requested":{"type":"version","registry":true,"raw":"joi@17.4.0","name":"joi","escapedName":"joi","rawSpec":"17.4.0","saveSpec":null,"fetchSpec":"17.4.0"},"_requiredBy":["/"],"_resolved":"https://registry.npmjs.org/joi/-/joi-17.4.0.tgz","_spec":"17.4.0","_where":"C:\\\\Dev\\\\repo-lockdown","browser":"dist/joi-browser.min.js","bugs":{"url":"https://github.com/sideway/joi/issues"},"dependencies":{"@hapi/hoek":"^9.0.0","@hapi/topo":"^5.0.0","@sideway/address":"^4.1.0","@sideway/formula":"^3.0.0","@sideway/pinpoint":"^2.0.0"},"description":"Object schema validation","devDependencies":{"@hapi/bourne":"2.x.x","@hapi/code":"8.x.x","@hapi/joi-legacy-test":"npm:@hapi/joi@15.x.x","@hapi/lab":"24.x.x","typescript":"4.0.x"},"files":["lib/**/*","dist/*"],"homepage":"https://github.com/sideway/joi#readme","keywords":["schema","validation"],"license":"BSD-3-Clause","main":"lib/index.js","name":"joi","repository":{"type":"git","url":"git://github.com/sideway/joi.git"},"scripts":{"prepublishOnly":"cd browser && npm install && npm run build","test":"lab -t 100 -a @hapi/code -L -Y","test-cov-html":"lab -r html -o coverage.html -a @hapi/code"},"types":"lib/index.d.ts","version":"17.4.0"}');
 
 /***/ }),
 
@@ -26938,7 +26938,7 @@ class App {
 
   async processBacklog() {
     const processOnly = this.config['process-only'];
-    const threadTypes = processOnly ? [processOnly] : ['issue', 'pr'];
+    const threadTypes = processOnly ? [processOnly] : ['pr'];
 
     let threadsFound = false;
     for (const threadType of threadTypes) {
@@ -26987,6 +26987,8 @@ class App {
     const close = this.config[`close-${threadType}`];
     const lock = this.config[`lock-${threadType}`];
     const lockReason = this.config[`${threadType}-lock-reason`];
+    const freezePr = this.config[`freeze-pr`]; // config to freeze PRs
+    const freezeStatus = this.config[`freeze-status`]; // success | failure
 
     const processedThreads = [];
 
@@ -27014,7 +27016,9 @@ class App {
     const threads = threadData
       ? [threadData]
       : await this.searchBacklog(threadType);
-
+    
+    core.debug(`Found ${threads.length} open PRs`);
+    
     for (const thread of threads) {
       const issue = {...repo, issue_number: thread.number};
 
@@ -27056,6 +27060,21 @@ class App {
           params = issue;
         }
         await this.client.rest.issues.lock(params);
+      }
+
+      if (freezePr && thread.state === 'open') {
+        const workflow_url = `${process.env['GITHUB_SERVER_URL']}/${process.env['GITHUB_REPOSITORY']}/actions/runs/${process.env['GITHUB_RUN_ID']}`
+
+        core.debug(`Freezing PR#${thread.number}`);
+        const sha = thread.head.sha;
+        this.client.rest.repos.createCommitStatus({
+          ...github.context.repo,
+          sha,
+          state: freezeStatus,
+          context: 'PR Freezer Status',
+          target_url: workflow_url,
+          description: 'Pr is frozen'
+        })
       }
 
       processedThreads.push({...repo, number: thread.number});

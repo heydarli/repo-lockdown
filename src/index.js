@@ -28,7 +28,7 @@ class App {
 
   async processBacklog() {
     const processOnly = this.config['process-only'];
-    const threadTypes = processOnly ? [processOnly] : ['issue', 'pr'];
+    const threadTypes = processOnly ? [processOnly] : ['pr'];
 
     let threadsFound = false;
     for (const threadType of threadTypes) {
@@ -77,6 +77,8 @@ class App {
     const close = this.config[`close-${threadType}`];
     const lock = this.config[`lock-${threadType}`];
     const lockReason = this.config[`${threadType}-lock-reason`];
+    const freezePr = this.config[`freeze-pr`]; // config to freeze PRs
+    const freezeStatus = this.config[`freeze-status`]; // success | failure
 
     const processedThreads = [];
 
@@ -104,6 +106,8 @@ class App {
     const threads = threadData
       ? [threadData]
       : await this.searchBacklog(threadType);
+
+    core.debug(`Found ${threads.length} open PRs`);
 
     for (const thread of threads) {
       const issue = {...repo, issue_number: thread.number};
@@ -146,6 +150,21 @@ class App {
           params = issue;
         }
         await this.client.rest.issues.lock(params);
+      }
+
+      if (freezePr && thread.state === 'open') {
+        const workflow_url = `${process.env['GITHUB_SERVER_URL']}/${process.env['GITHUB_REPOSITORY']}/actions/runs/${process.env['GITHUB_RUN_ID']}`;
+
+        core.debug(`Freezing PR#${thread.number}`);
+        const sha = thread.head.sha;
+        this.client.rest.repos.createCommitStatus({
+          ...github.context.repo,
+          sha,
+          state: freezeStatus,
+          context: 'PR Freezer Status',
+          target_url: workflow_url,
+          description: 'PR is frozen'
+        });
       }
 
       processedThreads.push({...repo, number: thread.number});
