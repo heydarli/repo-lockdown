@@ -165,9 +165,12 @@ class App {
           pull_number: thread.number
         });
 
+        console.log(JSON.stringify(pull_details));
+        console.log(JSON.stringify(thread));
+
         const sha = pull_details.head.sha;
         await this.client.rest.repos.createCommitStatus({
-          ...github.context.repo,
+          ...issue,
           sha,
           state: freezeStatus,
           context: 'PR Freezer Status',
