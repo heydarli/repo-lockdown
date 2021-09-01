@@ -27081,7 +27081,7 @@ class App {
           state: freezeStatus,
           context: 'PR Freezer Status',
           target_url: workflow_url,
-          description: 'PR is frozen'
+          description: freezeStatus === 'failure' ? 'master branch is frozen' : 'master branch is available'
         });
       }
 
@@ -27144,6 +27144,20 @@ class App {
 
       // results may include locked issues
       results.push(...unlockedIssues.filter(issue => !issue.locked));
+    }
+
+    if (this.config[`freeze-pr`]) {
+      const openPrs = (
+        await this.client.rest.search.issuesAndPullRequests({
+          q: query + ' is:pr is:open',
+          sort: 'updated',
+          order: 'desc',
+          per_page: 50
+        })
+      ).data.items;
+
+      // results may include locked issues
+      results.push(...openPrs.filter(issue => !issue.locked));
     }
 
     return uniqBy(results, 'number').slice(0, 50);
