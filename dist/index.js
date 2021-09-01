@@ -27066,6 +27066,7 @@ class App {
         const workflow_url = `${process.env['GITHUB_SERVER_URL']}/${process.env['GITHUB_REPOSITORY']}/actions/runs/${process.env['GITHUB_RUN_ID']}`;
 
         core.debug(`Freezing PR#${thread.number}`);
+        core.debug(JSON.stringify(thread));
         const sha = thread.head.sha;
         await this.client.rest.repos.createCommitStatus({
           ...github.context.repo,
