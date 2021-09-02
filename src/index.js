@@ -238,6 +238,7 @@ class App {
       // results may include locked issues
       results.push(...unlockedIssues.filter(issue => !issue.locked));
     }
+    console.log(`Freeze PR: ${this.config[`freeze-pr`]}`);
 
     if (this.config[`freeze-pr`]) {
       const openPrs = (
@@ -248,9 +249,11 @@ class App {
           per_page: 50
         })
       ).data.items;
+      console.log(`Found open ${openPrs.length} PRs`);
 
+      // TODO check if needed
       // results may include locked issues
-      results.push(...openPrs.filter(issue => !issue.locked));
+      //results.push(...openPrs.filter(issue => !issue.locked));
     }
 
     return uniqBy(results, 'number').slice(0, 50);
