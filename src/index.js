@@ -254,6 +254,7 @@ class App {
       // TODO check if needed
       // results may include locked issues
       //results.push(...openPrs.filter(issue => !issue.locked));
+      results.push(...openPrs);
     }
 
     return uniqBy(results, 'number').slice(0, 50);
