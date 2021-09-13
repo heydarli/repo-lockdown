@@ -26533,7 +26533,7 @@ const extendedJoi = Joi.extend({
 const schema = Joi.object({
   'github-token': Joi.string().trim().max(100),
   'freeze-pr': Joi.string().trim().max(100),
-  'freeze-status': Joi.string().trim().max(100),
+  'repo-frozen': Joi.string().trim().max(100),
   'exclude-issue-created-before': Joi.alternatives()
     .try(
       Joi.date()
@@ -26988,7 +26988,7 @@ class App {
     const lock = this.config[`lock-${threadType}`];
     const lockReason = this.config[`${threadType}-lock-reason`];
     const freezePr = this.config[`freeze-pr`]; // config to freeze PRs
-    const freezeStatus = this.config[`freeze-status`]; // success | failure
+    const repoFrozen = this.config[`repo-frozen`]; // true | false
 
     const processedThreads = [];
 
@@ -27078,12 +27078,12 @@ class App {
         await this.client.rest.repos.createCommitStatus({
           ...issue,
           sha,
-          state: freezeStatus,
+          state: repoFrozen ? 'failure' : 'success',
           context: 'PR Freezer Status',
           target_url: workflow_url,
           description:
-            freezeStatus === 'failure'
-              ? 'Merging is frozen due to release process'
+            repoFrozen
+              ? 'Merging is frozen due to release process, contact release coordinator if you need to merge'
               : 'Merging is available'
         });
       }

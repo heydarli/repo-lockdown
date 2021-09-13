@@ -81,7 +81,7 @@ class App {
     const lock = this.config[`lock-${threadType}`];
     const lockReason = this.config[`${threadType}-lock-reason`];
     const freezePr = this.config[`freeze-pr`]; // config to freeze PRs
-    const freezeStatus = this.config[`freeze-status`]; // success | failure
+    const repoFrozen = this.config[`repo-frozen`]; // true | false
 
     const processedThreads = [];
 
@@ -171,12 +171,12 @@ class App {
         await this.client.rest.repos.createCommitStatus({
           ...issue,
           sha,
-          state: freezeStatus,
+          state: repoFrozen ? 'failure' : 'success',
           context: 'PR Freezer Status',
           target_url: workflow_url,
           description:
-            freezeStatus === 'failure'
-              ? 'Merging is frozen due to release process'
+            repoFrozen
+              ? 'Merging is frozen due to release process, contact release coordinator if you need to merge'
               : 'Merging is available'
         });
       }

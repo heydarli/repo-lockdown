@@ -57,11 +57,11 @@ inputs:
     description: 'Process only issues or pull requests, value must be either `issues` or `prs`'
     default: ''
   freeze-pr:
-    description: 'Freeze PR`'
+    description: 'Enable PR Freezer`'
     default: ''
-  freeze-status:
-    description: 'Freeze status'
-    default: ''
+  repo-frozen:
+    description: 'Controls if merges to master branch disabled or not, Value must be either `true` or `false` (true will freeze the repo)'
+    default: false
 outputs:
   issues:
     description: 'Issues that have been closed or locked, value is a JSON string'
