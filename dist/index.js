@@ -27065,14 +27065,14 @@ class App {
       if (freezePr && thread.state === 'open') {
         const workflow_url = `${process.env['GITHUB_SERVER_URL']}/${process.env['GITHUB_REPOSITORY']}/actions/runs/${process.env['GITHUB_RUN_ID']}`;
 
-        console.log(`Freezing PR#${thread.number}`);
-        
+        console.log(`Freezing PR #${thread.number}`);
+
         const pull_details = await this.client.rest.pulls.get({
           ...github.context.repo,
           pull_number: thread.number
         });
 
-        console.log(JSON.stringify(pull_details.data.head));
+        // console.log(JSON.stringify(pull_details.data.head));
 
         const sha = pull_details.data.head.sha;
         await this.client.rest.repos.createCommitStatus({
@@ -27081,7 +27081,10 @@ class App {
           state: freezeStatus,
           context: 'PR Freezer Status',
           target_url: workflow_url,
-          description: freezeStatus === 'failure' ? 'master branch is frozen' : 'master branch is available'
+          description:
+            freezeStatus === 'failure'
+              ? 'Merging is frozen due to release process'
+              : 'Merging is available'
         });
       }
 
@@ -27156,7 +27159,6 @@ class App {
           per_page: 50
         })
       ).data.items;
-      console.log(`Found open ${openPrs.length} PRs`);
 
       // TODO check if needed
       // results may include locked issues
@@ -27211,12 +27213,6 @@ function getConfig() {
   }
 
   return value;
-
-  // return {
-  //   'freeze-pr': true,
-  //   'freeze-status': core.getInput('freeze-status'),
-  //   'github-token': core.getInput('freeze-status'),
-  // };
 }
 
 run();
