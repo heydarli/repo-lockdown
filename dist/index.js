@@ -26533,7 +26533,13 @@ const extendedJoi = Joi.extend({
 const schema = Joi.object({
   'github-token': Joi.string().trim().max(100),
   'freeze-pr': Joi.string().trim().max(100),
-  'repo-frozen': Joi.string().trim().max(100),
+  'repo-frozen': Joi.boolean()
+    .default(false)
+    .error(
+      new Error(
+        '"repo-frozen" must be a boolean'
+      )
+    ),
   'exclude-issue-created-before': Joi.alternatives()
     .try(
       Joi.date()
@@ -27148,7 +27154,12 @@ class App {
       // results may include locked issues
       results.push(...unlockedIssues.filter(issue => !issue.locked));
     }
-    console.log(`Freeze PR: ${this.config[`freeze-pr`]}`);
+    
+    console.log(
+      `Freeze PR enabled: ${this.config[`freeze-pr`]}, repoFrozen set to ${
+        this.config[`repo-frozen`]
+      }`
+    );
 
     if (this.config[`freeze-pr`]) {
       const openPrs = (

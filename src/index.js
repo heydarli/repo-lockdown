@@ -241,7 +241,12 @@ class App {
       // results may include locked issues
       results.push(...unlockedIssues.filter(issue => !issue.locked));
     }
-    console.log(`Freeze PR: ${this.config[`freeze-pr`]}`);
+    
+    console.log(
+      `Freeze PR enabled: ${this.config[`freeze-pr`]}, repoFrozen set to ${
+        this.config[`repo-frozen`]
+      }`
+    );
 
     if (this.config[`freeze-pr`]) {
       const openPrs = (

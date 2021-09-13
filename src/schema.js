@@ -36,7 +36,13 @@ const extendedJoi = Joi.extend({
 const schema = Joi.object({
   'github-token': Joi.string().trim().max(100),
   'freeze-pr': Joi.string().trim().max(100),
-  'repo-frozen': Joi.string().trim().max(100),
+  'repo-frozen': Joi.boolean()
+    .default(false)
+    .error(
+      new Error(
+        '"repo-frozen" must be a boolean'
+      )
+    ),
   'exclude-issue-created-before': Joi.alternatives()
     .try(
       Joi.date()
