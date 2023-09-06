@@ -26,7 +26,7 @@
     "lodash.uniqby": "^4.7.0"
   },
   "devDependencies": {
-    "@vercel/ncc": "^0.28.6",
+    "@vercel/ncc": "^0.38.0",
     "npm-check-updates": "^11.8.1",
     "prettier": "^2.3.2",
     "standard-version": "^9.3.0"
